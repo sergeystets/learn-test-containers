@@ -1,8 +1,11 @@
 package learn.test.containers;
 
 import java.time.LocalDate;
+import java.util.TimeZone;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +22,21 @@ public class HibernateBugWorkaroundTest extends IntegrationTest.Jpa {
   @Autowired
   private ReportRepository reportRepo;
 
+  private static final TimeZone originalTimezone = TimeZone.getDefault();
+
+  @BeforeClass
+  public static void beforeClass() {
+    // to reproduce the bug we need to set up a timezone which differs from a db server timezone
+    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Kiev"));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    TimeZone.setDefault(originalTimezone);
+  }
+
   @After
-  public void tearDown() {
+  public void after() {
     reportRepo.deleteAll();
   }
 
